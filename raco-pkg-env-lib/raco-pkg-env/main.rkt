@@ -5,7 +5,7 @@
          racket/pretty
          setup/dirs)
 
-(define (install-environment env-dir)
+(define (install-environment! env-dir)
   (define env-config-dir (build-path env-dir "etc"))
   (define system-config-rktd
     (build-path (find-config-dir) "config.rktd"))
@@ -41,7 +41,6 @@
                ;; 'installation-name "b1760145-c765-4f74-ac27-bd5f441c60a5"
                ))
 
-
   (make-directory* env-config-dir)
   (call-with-output-file (build-path env-config-dir "config.rktd")
     (lambda (outp)
@@ -50,4 +49,10 @@
   (call-with-output-file (build-path env-dir "activate.sh")
     (lambda (outp)
       (displayln (~a "export PLTCONFIGDIR=\"" env-config-dir "\"") outp))))
+
+(module* main #f
+  (require racket/match)
+  (match (current-command-line-arguments)
+    [(vector env-dir-string)
+     (install-environment! (string->path env-dir-string))]))
 
