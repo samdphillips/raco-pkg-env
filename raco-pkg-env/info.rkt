@@ -3,8 +3,7 @@
 (define collection "raco-pkg-env")
 (define deps
   '("base"
-    "raco-pkg-env-lib"
-    "rackunit-lib"))
+    "raco-pkg-env-lib"))
 (define build-deps
   '("racket-doc"
     "scribble-lib"))
