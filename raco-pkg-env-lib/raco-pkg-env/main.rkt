@@ -54,5 +54,7 @@
   (require racket/match)
   (match (current-command-line-arguments)
     [(vector env-dir-string)
-     (install-environment! (string->path env-dir-string))]))
+     (install-environment!
+      (path->complete-path
+       (string->path env-dir-string)))]))
 
