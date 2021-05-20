@@ -2,8 +2,23 @@
 
 (require racket/file
          racket/format
+         racket/match
+         racket/path
          racket/pretty
          setup/dirs)
+
+(define (setup-env-dir key system-config env-config proc)
+  (let ([src (hash-ref system-config 'lib-dir #f)]
+        [dest (hash-ref env-config 'lib-dir)])
+    (make-directory* dest)
+    (when src
+      (define (destname n)
+        (build-path dest (file-name-from-path n)))
+      (define (link n)
+        (make-file-or-directory-link n (destname n)))
+      (define (copy n)
+        (copy-file n (destname n)))
+      (for ([fname (in-directory src)]) (proc fname copy link)))))
 
 (define (install-environment! env-dir)
   (define env-config-dir (build-path env-dir "etc"))
@@ -15,8 +30,17 @@
   (define env-config
     (hash-set* system-config
                ;; changed keys
+               'bin-dir
+               (path->string (build-path env-dir "bin"))
+
                'doc-dir
                (path->string (build-path env-dir "doc"))
+
+               'lib-dir
+               (path->string (build-path env-dir "lib"))
+
+               'share-dir
+               (path->string (build-path env-dir "share"))
 
                ;; added keys
                'default-scope
@@ -45,6 +69,19 @@
   (call-with-output-file (build-path env-config-dir "config.rktd")
     (lambda (outp)
       (pretty-write env-config outp)))
+
+  ;; Setup lib-dir
+  ;; Copy config files, symlink everything else
+  (setup-env-dir 'lib-dir system-config env-config
+                 (lambda (fname copy link)
+                   (match (path-get-extension fname)
+                     [#".rktd" (copy fname)]
+                     [_        (link fname)])))
+
+
+  ;; Setup bin-dir
+  (setup-env-dir 'bin-dir system-config env-config
+                 (lambda (fname copy link) (link fname)))
 
   (call-with-output-file (build-path env-dir "activate.sh")
     (lambda (outp)
