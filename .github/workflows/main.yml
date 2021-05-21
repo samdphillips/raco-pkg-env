@@ -1,0 +1,19 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  build:
+    name: "Build on Racket"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - uses: Bogdanp/setup-racket@v1.1
+        with:
+          version: stable
+      - name: Installing raco-pkg-env-lib and its dependencies
+        run: raco pkg install --batch --no-docs --auto --link raco-pkg-env-lib
+      - name: Installing raco-pkg-env and its dependencies
+        run: raco pkg install --batch --no-docs --auto --link raco-pkg-env
+      - name: Compiling raco-pkg-env-lib and building its docs
+        run: raco setup --check-pkg-deps --unused-pkg-deps --pkgs raco-pkg-env-lib
+      - name: Compiling raco-pkg-env and building its docs
+        run: raco setup --check-pkg-deps --unused-pkg-deps --pkgs raco-pkg-env
