@@ -10,7 +10,6 @@
 (define implies
   '("raco-pkg-env-lib"))
 (define build-deps
-  '("racket-doc"
-    "scribble-lib"))
+  '("scribble-lib"))
 (define scribblings
   '(["scribblings/raco-pkg-env.scrbl"]))
