@@ -1,12 +1,15 @@
-name: CI
-on: [push, pull_request]
+name: test
+on:
+  push:
+  schedule:
+  - cron: "17 23 * * TUE"
 jobs:
   build:
     name: "Build on Racket"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: Bogdanp/setup-racket@v1.1
+      - uses: Bogdanp/setup-racket@v1.7
         with:
           version: stable
       - name: Installing raco-pkg-env-lib and its dependencies
