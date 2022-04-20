@@ -11,8 +11,8 @@
 
 (define (setup-env-dir key system-config env-config proc)
   (log-pkg-env-info "setup-env-dir ~s" key)
-  (let ([src (hash-ref system-config 'lib-dir #f)]
-        [dest (hash-ref env-config 'lib-dir)])
+  (let ([src  (hash-ref system-config key #f)]
+        [dest (hash-ref env-config key)])
     (log-pkg-env-info "setting up ~s -> ~s" src dest)
     (make-directory* dest)
     (when src
