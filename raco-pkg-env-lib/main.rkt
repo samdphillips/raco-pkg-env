@@ -7,9 +7,13 @@
          racket/pretty
          setup/dirs)
 
+(define-logger pkg-env)
+
 (define (setup-env-dir key system-config env-config proc)
+  (log-pkg-env-info "setup-env-dir ~s" key)
   (let ([src (hash-ref system-config 'lib-dir #f)]
         [dest (hash-ref env-config 'lib-dir)])
+    (log-pkg-env-info "setting up ~s -> ~s" src dest)
     (make-directory* dest)
     (when src
       (define (destname n)
@@ -18,14 +22,21 @@
         (make-file-or-directory-link n (destname n)))
       (define (copy n)
         (copy-file n (destname n)))
-      (for ([fname (in-directory src)]) (proc fname copy link)))))
+      (for ([fname (in-directory src)])
+        (log-pkg-env-info "setting up ~s -> ~s" fname (destname fname))
+        (proc fname copy link)))))
 
 (define (install-environment! env-dir)
+  (log-pkg-env-info "install-environment! in ~s" env-dir)
   (define env-config-dir (build-path env-dir "etc"))
   (define system-config-rktd
     (build-path (find-config-dir) "config.rktd"))
+  (log-pkg-env-info "system-config-rktd is at ~s" system-config-rktd)
 
   (define system-config (file->value system-config-rktd))
+  (when (log-level? pkg-env-logger 'debug)
+    (log-pkg-env-debug "system-config is:")
+    (log-pkg-env-debug (pretty-format system-config #:mode 'write)))
 
   (define env-config
     (hash-set* system-config
