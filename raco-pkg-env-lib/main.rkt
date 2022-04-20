@@ -22,7 +22,7 @@
         (make-file-or-directory-link n (destname n)))
       (define (copy n)
         (copy-file n (destname n)))
-      (for ([fname (in-directory src)])
+      (for ([fname (directory-list src #:build? #t)])
         (log-pkg-env-info "setting up ~s -> ~s" fname (destname fname))
         (proc fname copy link)))))
 
