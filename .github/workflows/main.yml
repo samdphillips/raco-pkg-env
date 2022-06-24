@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
-      - uses: Bogdanp/setup-racket@v1.7
+      - uses: Bogdanp/setup-racket@v1.8.1
         with:
           version: stable
       - name: Installing raco-pkg-env-lib and its dependencies
