@@ -1,4 +1,4 @@
-#lang racket/base
+#lang at-exp racket/base
 
 (require racket/file
          racket/format
@@ -96,7 +96,12 @@
 
   (call-with-output-file (build-path env-dir "activate.sh")
     (lambda (outp)
-      (displayln (~a "export PLTCONFIGDIR=\"" env-config-dir "\"") outp))))
+      (displayln
+       @~a{SCRIPT_DIR=$(basename -- $( cd -- "$( dirname -- "$_" )" &> /dev/null\
+                                       && pwd ))
+           export PS1="(${SCRIPT_DIR}) ${PS1}"
+           export PLTCONFIGDIR="@env-config-dir"}
+       outp))))
 
 (module* main #f
   (require racket/match)
