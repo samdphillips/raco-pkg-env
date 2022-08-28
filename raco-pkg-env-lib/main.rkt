@@ -38,11 +38,12 @@
     (log-pkg-env-debug "system-config is:")
     (log-pkg-env-debug (pretty-format system-config #:mode 'write)))
 
+  (define env-bin-dir (build-path env-dir "bin"))
+
   (define env-config
     (hash-set* system-config
                ;; changed keys
-               'bin-dir
-               (path->string (build-path env-dir "bin"))
+               'bin-dir (path->string env-bin-dir)
 
                'doc-dir
                (path->string (build-path env-dir "doc"))
@@ -97,17 +98,24 @@
   (call-with-output-file (build-path env-dir "activate.sh")
     (lambda (outp)
       (displayln
-       @~a{SCRIPT_DIR=$(basename -- $( cd -- "$( dirname -- "$_" )" &> /dev/null\
-                                       && pwd ))
-           export PS1="(${SCRIPT_DIR}) ${PS1}"
-           export PLTCONFIGDIR="@env-config-dir"}
+       @~a{export PS1="(@(file-name-from-path (simplify-path env-dir))) ${PS1}"
+           export PLTCONFIGDIR="@env-config-dir"
+           export PATH="@|env-bin-dir|:$PATH"}
        outp))))
 
-(module* main #f
-  (require racket/match)
-  (match (current-command-line-arguments)
-    [(vector env-dir-string)
-     (install-environment!
-      (path->complete-path
-       (string->path env-dir-string)))]))
+(module+ main
+  (require racket/cmdline)
+  (define clear-directory (make-parameter #f))
+  (define env-dir
+    (command-line
+     #:program "pkg-env"
+     #:once-each
+     [("-c" "--clear") "Delete existing contents of environment directory"
+                       (clear-directory #t)]
+     #:args (folder)
+     folder))
+  (when (clear-directory) (delete-directory/files env-dir #:must-exist? #f))
+  (install-environment!
+   (path->complete-path
+    (string->path env-dir))))
 
