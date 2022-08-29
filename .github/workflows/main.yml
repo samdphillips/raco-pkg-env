@@ -1,6 +1,7 @@
-name: test
+name: Test install and compile
 on:
   push:
+  pull_request:
   schedule:
   - cron: "17 23 * * TUE"
 jobs:
