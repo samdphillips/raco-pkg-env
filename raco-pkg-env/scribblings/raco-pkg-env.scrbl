@@ -17,9 +17,12 @@ Create a new package environment (from the shell):
  ;; make the environment
  new-package> raco pkg-env _env
 
+ ;; make the environment removing any existing environment
+ new-package> raco pkg-env --clear _env
+
  ;; simple bash script that sets the PLTCONFIGDIR variable
  new-package> source _env/activate.sh
 
  ;; install some-package into _env
- new-package> raco pkg install some-packagename
+ (_env) new-package> raco pkg install some-packagename
 }
