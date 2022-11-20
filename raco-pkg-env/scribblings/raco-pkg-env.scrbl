@@ -3,6 +3,8 @@
 @title{raco-pkg-env: virtualenv like tool for Racket}
 @author[(author+email "Sam Phillips" "samdphillips@gmail.com")]
 
+@section{Guide}
+
 @bold{**EXPERIMENTAL**}
 
 This tool writes a @tt{config.rktd} file that you can point
@@ -26,3 +28,6 @@ Create a new package environment (from the shell):
  ;; install some-package into _env
  (_env) new-package> raco pkg install some-packagename
 }
+
+@include-section["changelog.scrbl"]
+
